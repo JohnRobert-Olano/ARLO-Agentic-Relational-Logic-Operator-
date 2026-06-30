@@ -74,8 +74,8 @@
 }
 
 .input:focus {
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
+  border-color: #E24831;
+  box-shadow: 0 0 0 4px rgba(255, 99, 74, 0.12);
   background: #ffffff;
 }
 
@@ -89,13 +89,13 @@
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 4px 12px rgba(255, 99, 74, 0.25);
   transition: all 0.2s ease-in-out;
 }
 
 .submitBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 6px 16px rgba(255, 99, 74, 0.35);
   filter: brightness(1.05);
 }
 
@@ -119,7 +119,7 @@
 .toggleBtn {
   background: none;
   border: none;
-  color: #4f46e5;
+  color: #FF634A;
   font-weight: 600;
   cursor: pointer;
   padding: 0 4px;
@@ -128,7 +128,7 @@
 }
 
 .toggleBtn:hover {
-  color: #8b5cf6;
+  color: #E24831;
 }
 
 .errorBox {

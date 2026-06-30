@@ -66,22 +66,22 @@
 .navItem:hover {
   transform: translateY(-2px);
   background: #ffffff;
-  color: #4f46e5;
-  box-shadow: 0 8px 16px rgba(79, 70, 229, 0.12);
-  border-color: rgba(79, 70, 229, 0.2);
+  color: #FF634A;
+  box-shadow: 0 8px 16px rgba(255, 99, 74, 0.12);
+  border-color: rgba(255, 99, 74, 0.2);
 }
 
 .navItemActive {
   background: var(--accent-gradient);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 8px 20px rgba(255, 99, 74, 0.3);
 }
 
 .navItemActive:hover {
   background: var(--accent-gradient);
   color: #ffffff;
-  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 10px 24px rgba(255, 99, 74, 0.35);
 }
 
 .signOutBtn {
@@ -390,7 +390,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 8px 24px rgba(255, 99, 74, 0.35);
   cursor: pointer;
   z-index: 110;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -398,7 +398,7 @@
 
 .chatFab:hover {
   transform: scale(1.05);
-  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 10px 30px rgba(255, 99, 74, 0.45);
 }
 
 .chatFab:active {
@@ -430,8 +430,8 @@
 .pill:hover {
   background: #ffffff;
   color: var(--text-primary);
-  border-color: rgba(79, 70, 229, 0.2);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+  border-color: rgba(255, 99, 74, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 99, 74, 0.08);
   transform: translateY(-1px);
 }
 
@@ -473,13 +473,13 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 4px 10px rgba(255, 99, 74, 0.2);
   transition: all 0.2s ease;
 }
 
 .commandSendBtn:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 14px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 6px 14px rgba(255, 99, 74, 0.3);
 }
 
 /* FORM STYLING FOR DIALOGS / CARD INSERTS */
@@ -521,7 +521,7 @@
 }
 
 .input:focus, .select:focus {
-  border-color: #8b5cf6;
+  border-color: #E24831;
   background: #ffffff;
 }
 
@@ -534,7 +534,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 99, 74, 0.15);
   transition: all 0.2s ease;
   margin-top: 8px;
 }

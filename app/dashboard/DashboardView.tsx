@@ -372,8 +372,8 @@ export default function DashboardView() {
             <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="arlo-logo-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#4f46e5" />
-                  <stop offset="100%" stopColor="#8b5cf6" />
+                  <stop offset="0%" stopColor="#FF634A" />
+                  <stop offset="100%" stopColor="#E24831" />
                 </linearGradient>
               </defs>
               <path d="M 50 10 L 10 90 L 90 90 Z" fill="url(#arlo-logo-gradient)" />
@@ -769,7 +769,7 @@ export default function DashboardView() {
                     </div>
 
                     <div className={styles.listMeta} style={{ minWidth: 'auto', flexWrap: 'wrap' }}>
-                      <span className={styles.listTitle} style={{ fontSize: 13, color: '#4f46e5' }}>
+                      <span className={styles.listTitle} style={{ fontSize: 13, color: '#FF634A' }}>
                         {formatTime(event.start_time)} - {formatTime(event.end_time)}
                       </span>
                       <button
