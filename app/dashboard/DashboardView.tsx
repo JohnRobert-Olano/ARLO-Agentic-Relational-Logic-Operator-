@@ -768,7 +768,7 @@ export default function DashboardView() {
                       <span className={styles.listSubtitle}>{event.description}</span>
                     </div>
 
-                    <div className={styles.listMeta} style={{ minWidth: 140 }}>
+                    <div className={styles.listMeta} style={{ minWidth: 'auto', flexWrap: 'wrap' }}>
                       <span className={styles.listTitle} style={{ fontSize: 13, color: '#4f46e5' }}>
                         {formatTime(event.start_time)} - {formatTime(event.end_time)}
                       </span>
