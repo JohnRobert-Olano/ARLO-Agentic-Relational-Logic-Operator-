@@ -168,6 +168,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .cardTitle {
@@ -256,6 +258,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   padding: 14px 16px;
   background: rgba(255, 255, 255, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.4);
@@ -599,6 +603,10 @@
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
+  }
+  .statsRow {
+    flex-direction: column;
+    gap: 12px;
   }
   .sidebar {
     width: calc(100% - 24px);

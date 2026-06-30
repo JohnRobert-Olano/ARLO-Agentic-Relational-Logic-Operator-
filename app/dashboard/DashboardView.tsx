@@ -859,7 +859,7 @@ export default function DashboardView() {
                       </span>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       <span className={`${styles.badge} ${task.status === 'Completed' ? styles.badgeCompleted :
                         task.status === 'In Progress' ? styles.badgeInProgress : styles.badgePending
                         }`}>
