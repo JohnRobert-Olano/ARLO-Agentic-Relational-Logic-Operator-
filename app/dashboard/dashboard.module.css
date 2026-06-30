@@ -1,7 +1,7 @@
 .layout {
   display: flex;
   height: 100dvh;
-  width: 100vw;
+  width: 100%;
   overflow: hidden;
   position: relative;
 }
@@ -600,29 +600,36 @@
     flex-direction: column;
   }
   .sidebar {
-    width: calc(100% - 32px);
-    height: 72px;
-    margin: 16px;
+    width: calc(100% - 24px);
+    height: 64px;
+    margin: 12px;
     flex-direction: row;
-    padding: 0 24px;
+    padding: 0 16px;
   }
   .logoArea {
     flex-direction: row;
   }
   .navGroup {
     flex-direction: row;
-    gap: 12px;
+    gap: 6px;
+  }
+  .navItem, .signOutBtn {
+    width: 40px;
+    height: 40px;
   }
   .main {
-    padding: 16px 16px 120px 16px;
+    padding: 12px 12px calc(120px + env(safe-area-inset-bottom, 16px)) 12px;
+  }
+  .card {
+    padding: 20px;
   }
   .commandContainer {
-    width: calc(100% - 32px);
-    right: 16px;
-    bottom: 90px;
+    width: calc(100% - 24px);
+    right: 12px;
+    bottom: calc(84px + env(safe-area-inset-bottom, 16px));
   }
   .chatFab {
     right: 16px;
-    bottom: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 16px));
   }
 }
