@@ -1,6 +1,6 @@
 .layout {
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
   overflow: hidden;
   position: relative;
@@ -9,7 +9,7 @@
 /* LEFT NAVIGATION RAIL */
 .sidebar {
   width: 96px;
-  height: calc(100vh - 48px);
+  height: calc(100dvh - 48px);
   margin: 24px 0 24px 24px;
   background: var(--sidebar-bg);
   border: var(--sidebar-border);

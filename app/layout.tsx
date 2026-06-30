@@ -2,9 +2,19 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/lib/AuthContext';
 
+import { Viewport } from 'next';
+
 export const metadata: Metadata = {
   title: 'ARLO',
   description: 'Your intelligent self-hosted orchestration engine with real-time analytics.',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#f6f8fa',
 };
 
 export default function RootLayout({
@@ -14,9 +24,6 @@ export default function RootLayout({
   }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-      </head>
       <body>
         <AuthProvider>
           {children}
