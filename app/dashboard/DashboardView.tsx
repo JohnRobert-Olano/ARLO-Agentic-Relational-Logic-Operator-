@@ -305,8 +305,9 @@ export default function DashboardView() {
       // Refresh the dashboard data to show the new changes
       fetchAllData();
 
-    } catch (error: any) {
-      showFeedback(`Failed: ${error.message}`, 'error');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      showFeedback(`Failed: ${errorMessage}`, 'error');
     } finally {
       setIsCommandLoading(false);
     }
