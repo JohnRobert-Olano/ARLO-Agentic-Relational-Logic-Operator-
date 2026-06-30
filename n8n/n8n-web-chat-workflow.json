@@ -1,0 +1,621 @@
+{
+  "name": "ARLO Orchestrator (Web Chat)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "web-chat-webhook",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -3680,
+        -688
+      ],
+      "id": "5d1d53e4-48f5-45c0-b506-91edda7fcfe4",
+      "name": "Web Chat Webhook",
+      "webhookId": "web-chat-webhook-id"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ output: $json.output }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -2736,
+        -672
+      ],
+      "id": "e6eb449f-068f-4e5c-8ac3-6b00ea2db08b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "= qwen2.5:7b",
+          "mode": "id"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -3376,
+        -448
+      ],
+      "id": "bcbfd7be-dc4a-4070-8d8a-76e9091bcce2",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "0AHJdGNO0zH30gX0",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Message: {{ $json.body.message.text }} ",
+        "options": {
+          "systemMessage": "=You are a fast, efficient, and intelligent personal assistant. You manage finances, tasks, and schedules. \n\n[CURRENT CONTEXT]\nToday's Date and Time: {{ $now.setZone('Asia/Manila').toFormat('yyyy-MM-dd HH:mm:ss cccc') }} (Philippine Time). Always use this as your reference for \"today\", \"tomorrow\", or any relative time mentioned by the user.\n\n### Core Directives & Order of Operations:\n1. **TOOL EXECUTION FIRST (CRITICAL):** Depending on the user's input, your VERY FIRST AND ONLY action must be to natively invoke the appropriate tool ('Log Finances', 'Add Task', 'Schedule Event', or 'Get Financial Summary').\n2. **NO PRE-CHAT:** You are STRICTLY FORBIDDEN from generating any conversational text, pleasantries, or acknowledgments before calling the tool. \n3. **Automatic Inference:** DO NOT ask clarifying questions. Infer the required fields silently:\n   - For Finances: Infer amount, type (\"Expense\" or \"Gross Income\"), category, and description.\n   - For Financial Summary: Infer timeframe (e.g. today, this_month, ALL), category (e.g. Food, ALL), search_term. If user asks 'wallet balance', 'total income', or 'total expense', use 'ALL' for category. The tool returns both income and expense totals automatically, so DO NOT filter category by 'Income' or 'Expense'. MUST provide all 3 keys in JSON. Use empty string \"\" if no search term.\\n   - For Tasks: Infer title, priority (\"Low\", \"Medium\", \"High\"), due date (if any).\n   - For Schedules: Infer title, description, start_time (ISO string), and end_time (ISO string).\n   - `user_id`: Extract the exact User ID provided in the system context and pass it to the tools.\n4. **Confirmation Response:** ONLY after the tool has returned, generate a brief conversational reply. If the tool returns an error or conflict (e.g. time slot taken), inform the user nicely. If it succeeds, confirm the action."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -3296,
+        -672
+      ],
+      "id": "8f01fbff-1cfa-4f22-bf2a-94a0b803e522",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.message.session_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -3232,
+        -416
+      ],
+      "id": "e75befc3-3396-464e-8814-23e1abac9167",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to log a financial transaction (expense or income). You must extract the amount, type, category, and description from the user's message. Once the tool returns a success message, DO NOT call this tool again. Immediately respond to the user confirming it was logged.",
+        "workflowId": {
+          "__rl": true,
+          "value": "3eSvtQBQyLlUiRQh",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/3eSvtQBQyLlUiRQh",
+          "cachedResultName": "Log Finances"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "amount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('amount', ``, 'number') }}",
+            "type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('type', `Must be exactly \"Expense\" or \"Gross Income\". You MUST guess this automatically (e.g. if they spent money, it is an Expense).`, 'string') }}",
+            "category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('category', `The category of the transaction. You MUST guess this automatically based on the item (e.g. if hotdog, use 'Food'). Do not ask the user for it.`, 'string') }}",
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', `A short description of the item. Guess this from the user's message.`, 'string') }}",
+            "user_id": "={{ $json.body.message.chat.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -2992,
+        -400
+      ],
+      "id": "d7ab05ee-d458-4ca4-8a32-1d8166adb8dd",
+      "name": "Log Finances"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to add a task to the checklist. Extract title, priority, due_date.",
+        "workflowId": {
+          "__rl": true,
+          "value": "1b0859db-ab3a-4c37-ac50-917ff2e3303d",
+          "mode": "list",
+          "cachedResultUrl": "",
+          "cachedResultName": "Add Task"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('title', ``, 'string') }}",
+            "priority": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('priority', `Must be 'Low', 'Medium', or 'High'.`, 'string') }}",
+            "due_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('due_date', `ISO string or empty`, 'string') }}",
+            "user_id": "={{ $json.body.message.chat.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "due_date",
+              "displayName": "due_date",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -2992,
+        -200
+      ],
+      "id": "add-task-tool-node",
+      "name": "Add Task"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to schedule an event. Extract title, description, start_time, end_time.",
+        "workflowId": {
+          "__rl": true,
+          "value": "9b0859db-ab3a-4c37-ac50-917ff2e3303d",
+          "mode": "list",
+          "cachedResultUrl": "",
+          "cachedResultName": "Schedule Event"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('title', ``, 'string') }}",
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', ``, 'string') }}",
+            "start_time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('start_time', `ISO string`, 'string') }}",
+            "end_time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('end_time', `ISO string`, 'string') }}",
+            "user_id": "={{ $json.body.message.chat.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "start_time",
+              "displayName": "start_time",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "end_time",
+              "displayName": "end_time",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -2992,
+        0
+      ],
+      "id": "schedule-event-tool-node",
+      "name": "Schedule Event"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to add a task to the checklist. Extract title, priority, due_date.",
+        "workflowId": {
+          "__rl": true,
+          "value": "1b0859db-ab3a-4c37-ac50-917ff2e3303d",
+          "mode": "list",
+          "cachedResultUrl": "",
+          "cachedResultName": "Add Task"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('title', ``, 'string') }}",
+            "priority": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('priority', `Must be 'Low', 'Medium', or 'High'.`, 'string') }}",
+            "due_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('due_date', `ISO string or empty`, 'string') }}",
+            "user_id": "={{ $json.body.message.chat.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "due_date",
+              "displayName": "due_date",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -2992,
+        -200
+      ],
+      "id": "add-task-tool-node",
+      "name": "Add Task"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to schedule an event. Extract title, description, start_time, end_time.",
+        "workflowId": {
+          "__rl": true,
+          "value": "9b0859db-ab3a-4c37-ac50-917ff2e3303d",
+          "mode": "list",
+          "cachedResultUrl": "",
+          "cachedResultName": "Schedule Event"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('title', ``, 'string') }}",
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', ``, 'string') }}",
+            "start_time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('start_time', `ISO string`, 'string') }}",
+            "end_time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('end_time', `ISO string`, 'string') }}",
+            "user_id": "={{ $json.body.message.chat.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "start_time",
+              "displayName": "start_time",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "end_time",
+              "displayName": "end_time",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "type": "string",
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -2992,
+        0
+      ],
+      "id": "schedule-event-tool-node",
+      "name": "Schedule Event"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to calculate financial summaries, check wallet balances, or lookup specific transactions. Optional params: timeframe (e.g. today, this_week, this_month, last_month, weekend), category (e.g. Food, Transport, or ALL), search_term (string to filter by description).",
+        "workflowId": {
+          "__rl": true,
+          "value": "get-fin-sum-workflow-v1",
+          "mode": "id",
+          "cachedResultUrl": "",
+          "cachedResultName": "Get Financial Summary"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timeframe": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('timeframe', `e.g. today, this_month. If asking for overall balance or no time specified, output 'ALL'. MUST provide this key.`, 'string') }}",
+            "category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('category', `e.g. Food, Transport. If asking for overall balance, income, or expense, output 'ALL'. DO NOT use 'Income' or 'Expense' as categories. MUST provide this key.`, 'string') }}",
+            "search_term": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('search_term', `e.g. internet. If no specific item mentioned, output empty string ''. MUST provide this key.`, 'string') }}",
+            "user_id": "={{ $json.body.message.chat.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "timeframe",
+              "displayName": "timeframe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "search_term",
+              "displayName": "search_term",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -2800,
+        -100
+      ],
+      "id": "get-fin-sum-tool-node",
+      "name": "Get Financial Summary"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Web Chat Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Finances": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Task": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Financial Summary": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "88a39442-99c7-4f81-9d88-dd1f93cd4d64",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd8f17e5b509f4086c458cdf5215e2c44ff2ca4ef20e9fc14d42efa61cbd2d39"
+  },
+  "nodeGroups": [],
+  "id": "7g9q5pwAofigE7fJ",
+  "tags": []
+}

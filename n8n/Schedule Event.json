@@ -1,0 +1,281 @@
+{
+  "name": "Schedule Event",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "title",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "name": "start_time",
+              "type": "string"
+            },
+            {
+              "name": "end_time",
+              "type": "string"
+            },
+            {
+              "name": "user_id",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "trigger-node",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "schedules",
+        "limit": 100,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        200,
+        0
+      ],
+      "id": "get-schedules-node",
+      "name": "Fetch Schedules",
+      "credentials": {
+        "supabaseApi": {
+          "id": "axD01ZbixSPw0e0c",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const newStart = new Date($('Execute Workflow Trigger').item.json.start_time).getTime();\nconst newEnd = new Date($('Execute Workflow Trigger').item.json.end_time).getTime();\n\nlet conflict = false;\nlet conflictEvent = null;\n\nfor (const item of $input.all()) {\n  const existingStart = new Date(item.json.start_time).getTime();\n  const existingEnd = new Date(item.json.end_time).getTime();\n  \n  if (newStart < existingEnd && newEnd > existingStart) {\n    conflict = true;\n    conflictEvent = item.json;\n    break;\n  }\n}\n\nif (conflict) {\n  return [{ json: { hasConflict: true, message: `Time slot conflicts with existing event: '${conflictEvent.title}' (${new Date(conflictEvent.start_time).toLocaleTimeString()} - ${new Date(conflictEvent.end_time).toLocaleTimeString()})` } }];\n} else {\n  return [{ json: { hasConflict: false } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "check-conflict-node",
+      "name": "Check for Conflict"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.hasConflict }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        0
+      ],
+      "id": "if-conflict-node",
+      "name": "If Conflict"
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "tableId": "schedules",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $('Execute Workflow Trigger').item.json.title }}"
+            },
+            {
+              "fieldId": "description",
+              "fieldValue": "={{ $('Execute Workflow Trigger').item.json.description }}"
+            },
+            {
+              "fieldId": "start_time",
+              "fieldValue": "={{ $('Execute Workflow Trigger').item.json.start_time }}"
+            },
+            {
+              "fieldId": "end_time",
+              "fieldValue": "={{ $('Execute Workflow Trigger').item.json.end_time }}"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Execute Workflow Trigger').item.json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        800,
+        100
+      ],
+      "id": "insert-schedule-node",
+      "name": "Add Schedule Event",
+      "credentials": {
+        "supabaseApi": {
+          "id": "axD01ZbixSPw0e0c",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "boolean": [
+            {
+              "name": "success",
+              "value": true
+            }
+          ],
+          "string": [
+            {
+              "name": "message",
+              "value": "Event scheduled successfully."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        100
+      ],
+      "id": "return-success-node",
+      "name": "Return Success"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "boolean": [
+            {
+              "name": "success",
+              "value": false
+            }
+          ],
+          "string": [
+            {
+              "name": "error",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -100
+      ],
+      "id": "return-conflict-node",
+      "name": "Return Conflict"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Schedules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Schedules": {
+      "main": [
+        [
+          {
+            "node": "Check for Conflict",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Conflict": {
+      "main": [
+        [
+          {
+            "node": "If Conflict",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Conflict": {
+      "main": [
+        [
+          {
+            "node": "Return Conflict",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Schedule Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Schedule Event": {
+      "main": [
+        [
+          {
+            "node": "Return Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9b0859db-ab3a-4c37-ac50-917ff2e3303d",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "SchedEv3ntTool678",
+  "tags": []
+}

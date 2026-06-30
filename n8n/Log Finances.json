@@ -1,0 +1,263 @@
+{
+  "name": "ARLO Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        720
+      ],
+      "id": "25eebd20-acfc-4ea0-bc0a-503dbb24fa7d",
+      "name": "Telegram Trigger",
+      "webhookId": "44563a9b-6d78-4d77-929d-915a4d320735",
+      "credentials": {
+        "telegramApi": {
+          "id": "vu4KCxmDRa8oisu1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1824,
+        704
+      ],
+      "id": "08d11277-3755-445c-a7a9-d7fe68a541cb",
+      "name": "Send a text message",
+      "webhookId": "90e363ac-a4b9-4fec-b5c5-8f62554b8850",
+      "credentials": {
+        "telegramApi": {
+          "id": "vu4KCxmDRa8oisu1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "= qwen2.5:7b",
+          "mode": "id"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1184,
+        928
+      ],
+      "id": "0d58c5b4-4e80-445c-a4c3-bbd0742b6985",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "0AHJdGNO0zH30gX0",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a fast, efficient, and intelligent financial assistant. Your primary job is to parse the user's messages for financial transactions (expenses or income) and log them immediately using the Log Finances tool.\n\n### Core Directives:\n* **Zero-Friction Logging:** When a user states they spent or received money (e.g., \"I spent 100 on a hotdog\" or \"Got my 5000 salary\"), you must execute the `log_transaction` tool immediately. \n* **Automatic Inference:** DO NOT ask the user clarifying questions. You must automatically infer the required fields based on the context:\n    * `amount`: Extract the numerical value.\n    * `type`: Infer as \"Expense\" (if they bought/paid for something) or \"Gross Income\" (if they received money).\n    * `category`: Intelligently guess the best financial category (e.g., \"hotdog\" -> \"Food\", \"taxi\" -> \"Transport\", \"electricity\" -> \"Utilities\", \"salary\" -> \"Income\").\n    * `description`: Provide a brief summary of the item/service.\n* **Strict Order of Operations:** You must CALL the `log_transaction` tool FIRST. You are strictly forbidden from replying to the user before the tool has been executed. \n* **Confirmation Response:** ONLY after the tool returns a success status, reply to the user with a brief, friendly confirmation of what was logged. \n\n### Example Interactions:\nUser: \"I spent 100 for hotdog\"\n[Internal Action: Call `log_transaction` with amount=100, type=\"Expense\", category=\"Food\", description=\"Hotdog\"]\nAgent Reply: \"Got it! I've logged an expense of 100 for Food (Hotdog).\"\n\nUser: \"Paid 1500 for internet\"\n[Internal Action: Call `log_transaction` with amount=1500, type=\"Expense\", category=\"Utilities\", description=\"Internet bill\"]\nAgent Reply: \"Done. Logged a 1500 expense under Utilities (Internet bill).\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1264,
+        704
+      ],
+      "id": "4a19a0a0-e884-4053-952f-33eb7e87b98c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.message_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        1328,
+        960
+      ],
+      "id": "582d121e-7437-4660-99a4-88c25b2f7195",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to log a financial transaction (expense or income). You must extract the amount, type, category, and description from the user's message. Once the tool returns a success message, DO NOT call this tool again. Immediately respond to the user confirming it was logged.",
+        "workflowId": {
+          "__rl": true,
+          "value": "3eSvtQBQyLlUiRQh",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/3eSvtQBQyLlUiRQh",
+          "cachedResultName": "Log Finances"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "amount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('amount', ``, 'number') }}",
+            "type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('type', `Must be exactly \"Expense\" or \"Gross Income\". You MUST guess this automatically (e.g. if they spent money, it is an Expense).`, 'string') }}",
+            "category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('category', `The category of the transaction. You MUST guess this automatically based on the item (e.g. if hotdog, use 'Food'). Do not ask the user for it.`, 'string') }}",
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', `A short description of the item. Guess this from the user's message.`, 'string') }}",
+            "user_id": "9d9cb047-85d3-4f2e-aa9d-bc618577342f"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1568,
+        976
+      ],
+      "id": "df108ef2-644c-42e3-9026-31118c35ffba",
+      "name": "Log Finances"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Finances": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "70d2e63f-ea23-4f90-a35d-0e994987fe2b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd8f17e5b509f4086c458cdf5215e2c44ff2ca4ef20e9fc14d42efa61cbd2d39"
+  },
+  "nodeGroups": [],
+  "id": "IjPpV4DUEee9BT0I",
+  "tags": []
+}

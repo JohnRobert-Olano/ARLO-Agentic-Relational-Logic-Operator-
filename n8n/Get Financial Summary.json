@@ -1,0 +1,109 @@
+{
+  "name": "Get Financial Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "user_id",
+              "type": "string"
+            },
+            {
+              "name": "timeframe",
+              "type": "string"
+            },
+            {
+              "name": "category",
+              "type": "string"
+            },
+            {
+              "name": "search_term",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "trigger-get-financial-summary",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://iizacmdptpoiinwnvhte.supabase.co/rest/v1/rpc/get_financial_summary",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpemFjbWRwdHBvaWlud252aHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2OTQ3NjgsImV4cCI6MjA5ODI3MDc2OH0.qAXsrXTZlYF4sKiTn8bMpoSxV_5pAROA_mi8NwUmCmg"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpemFjbWRwdHBvaWlud252aHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2OTQ3NjgsImV4cCI6MjA5ODI3MDc2OH0.qAXsrXTZlYF4sKiTn8bMpoSxV_5pAROA_mi8NwUmCmg"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"p_user_id\": \"{{ $json.user_id }}\",\n  \"p_timeframe\": \"{{ $json.timeframe || '' }}\",\n  \"p_category\": \"{{ $json.category || '' }}\",\n  \"p_search_term\": \"{{ $json.search_term || '' }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "http-request-get-summary",
+      "name": "Call Supabase RPC"
+    }
+  ],
+  "pinData": {
+    "Execute Workflow Trigger": [
+      {
+        "json": {
+          "user_id": "9d9cb047-85d3-4f2e-aa9d-bc618577342f",
+          "timeframe": "this_month",
+          "category": "Food",
+          "search_term": ""
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call Supabase RPC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "get-fin-sum-workflow-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "GetFinSummTool001",
+  "tags": []
+}
