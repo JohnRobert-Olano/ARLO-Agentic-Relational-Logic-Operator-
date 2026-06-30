@@ -4,21 +4,21 @@
   --font-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   
   /* Palette Variables */
-  --bg-primary: #F4F4F6;
+  --bg-primary: #D2D2D4;
   --text-primary: #0f172a; /* Dark Slate */
   --text-muted: #475569; /* Slate 600 */
   --text-light: #94a3b8; /* Slate 400 */
   
   /* Glassmorphism Variables */
-  --card-bg: rgba(255, 255, 255, 0.7);
-  --card-border: 1px solid #E7E7E7;
+  --card-bg: rgba(244, 244, 246, 0.95);
+  --card-border: 1px solid rgba(255, 255, 255, 0.8);
   --card-radius: 20px;
-  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.01);
+  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
   --glass-blur: blur(16px);
   
   /* Sidebar Variables */
-  --sidebar-bg: rgba(255, 255, 255, 0.6);
-  --sidebar-border: 1px solid #E7E7E7;
+  --sidebar-bg: rgba(244, 244, 246, 0.98);
+  --sidebar-border: 1px solid rgba(255, 255, 255, 0.8);
   
   /* Subtle Ombre Gradients */
   --accent-gradient: linear-gradient(135deg, #FF634A 0%, #E24831 100%); /* Indigo to Purple */
