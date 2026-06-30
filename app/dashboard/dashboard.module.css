@@ -406,6 +406,7 @@
   flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-end;
+}
 
 .pill {
   padding: 6px 14px;
