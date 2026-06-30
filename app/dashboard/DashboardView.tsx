@@ -15,7 +15,9 @@ import {
   Trash2,
   RefreshCw,
   Check,
-  ChevronRight
+  ChevronRight,
+  MessageCircle,
+  X
 } from 'lucide-react';
 
 interface FinanceItem {
@@ -73,6 +75,7 @@ export default function DashboardView() {
   // Command Bar State
   const [commandText, setCommandText] = useState('');
   const [commandFeedback, setCommandFeedback] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCommandLoading, setIsCommandLoading] = useState(false);
 
   // Fetch logic
@@ -893,8 +896,8 @@ export default function DashboardView() {
         )}
       </main>
 
-      {/* 3. FLOATING COMMAND INPUT BAR */}
-      <div className={styles.commandContainer}>
+      {/* 3. FLOATING CHATBOT WIDGET */}
+      <div className={`${styles.commandContainer} ${isChatOpen ? styles.chatOpen : ''}`}>
         {commandFeedback && (
           <div className={commandFeedback.type === 'success' ? styles.successBox : styles.errorBox} style={{ width: '100%', textAlign: 'center', boxShadow: '0 8px 24px rgba(0,0,0,0.05)' }}>
             {commandFeedback.text}
@@ -913,7 +916,7 @@ export default function DashboardView() {
             id="nl-command-input"
             type="text"
             className={styles.commandInput}
-            placeholder={isCommandLoading ? "Bot is thinking..." : "Type assistant query... (e.g. spent ₱150 on lunch, todo refactor auth)"}
+            placeholder={isCommandLoading ? "Bot is thinking..." : "Message ARLO..."}
             value={commandText}
             onChange={(e) => setCommandText(e.target.value)}
             disabled={isCommandLoading}
@@ -923,6 +926,15 @@ export default function DashboardView() {
           </button>
         </form>
       </div>
+
+      {/* FAB BUTTON */}
+      <button 
+        className={styles.chatFab} 
+        onClick={() => setIsChatOpen(!isChatOpen)}
+        title="Toggle Chat"
+      >
+        {isChatOpen ? <X size={24} /> : <MessageCircle size={24} />}
+      </button>
     </div>
   );
 }
